@@ -10,7 +10,14 @@
 //
 //
 // -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
+Cypress.Commands.add('login', (email, password) => {
+  cy.visit('https://ingles-qazando.lovable.app/');
+  cy.contains('Entrar').click();
+  cy.wait(2000);
+  cy.get('input[type="email"]').type(email);
+  cy.get('input[type="password"]').type(password);
+  cy.get('form').submit();
+});
 //
 //
 // -- This is a child command --
