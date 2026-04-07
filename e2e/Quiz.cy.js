@@ -1,7 +1,21 @@
 describe('Quiz de Inglês', () => {
 
   beforeEach(() => {
-    cy.visit('https://ingles-qazando.lovable.app/quiz')
+    cy.visit('https://ingles-qazando.lovable.app/auth')
+
+    cy.get('input[type="email"]').type('admin@teste.com')
+    cy.get('input[type="password"]').type('Teste@123')
+
+    cy.contains('Entrar').click()
+
+    cy.contains('Ir para Exercícios').click()
+
+    cy.url().should('include', '/exercises')
+
+    cy.contains('Quiz').click()
+
+    // Espera redirecionar
+    cy.url().should('include', '/quiz')
   })
 
   it('Deve responder corretamente e incrementar acertos', () => {
