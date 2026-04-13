@@ -10,13 +10,13 @@
 //
 //
 // -- This is a parent command --
-Cypress.Commands.add('login', (email, password) => {
-  cy.visit('https://ingles-qazando.lovable.app/');
-  cy.contains('Entrar').click();
+Cypress.Commands.add("login", (email, password) => {
+  cy.visit("https://ingles-qazando.lovable.app/");
+  cy.contains("Entrar").click();
   cy.wait(2000);
   cy.get('input[type="email"]').type(email);
   cy.get('input[type="password"]').type(password);
-  cy.get('form').submit();
+  cy.get("form").submit();
 });
 //
 //
@@ -30,3 +30,13 @@ Cypress.Commands.add('login', (email, password) => {
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+// Comando para acessar exercicios
+Cypress.Commands.add("irParaExercicios", () => {
+  cy.contains("Ir para Exercícios").click();
+});
+
+// Comando para acessar trilha do inglês
+Cypress.Commands.add("acessarTrilhaDoIngles", () => {
+  cy.contains("Trilha do Inglês").click();
+});
