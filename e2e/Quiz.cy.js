@@ -5,7 +5,6 @@ describe('Quiz de Inglês', () => {
 
     cy.get('input[type="email"]').type('admin@teste.com')
     cy.get('input[type="password"]').type('Teste@123')
-
     cy.contains('Entrar').click()
 
     cy.contains('Ir para Exercícios').click()
@@ -23,7 +22,6 @@ describe('Quiz de Inglês', () => {
     // Valida se a questão 1 está correta
     cy.contains('1/30').should('be.visible')
 
-    // Clica na resposta correta
     cy.contains('feliz').click()
 
     // Valida se incrementou os acertos
