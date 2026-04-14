@@ -31,4 +31,15 @@ describe('Quiz de Inglês', () => {
 
   })
 
+  describe('Quiz - carregamento', () => {
+    it('Deve carregar a tela do quiz corretamente', () => {
+      cy.visit('/quiz')
+
+      cy.contains('Quiz de Inglês').should('be.visible')
+      cy.contains('Questão').should('be.visible')
+      cy.contains('Acertos').should('be.visible')
+      cy.contains('Erros').should('be.visible')
+    })
+  })
+
 })
