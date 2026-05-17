@@ -8,6 +8,7 @@ const translationMap = {
   speak: 'falar',
   write: 'escrever',
   read: 'ler',
+  work: 'trabalhar',
 
   // Nouns
   dog: 'cachorro',
