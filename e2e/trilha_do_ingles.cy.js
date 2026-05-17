@@ -2,9 +2,7 @@
 
 describe("Acessar Trilha do inglês", () => {
   it("Deve acessar trilha do inglês", () => {
-    cy.env(["email", "password"]).then((env) => {
-      cy.login(env.email, env.password);
-    });
+    cy.login("admin@teste.com", "Teste@123");
 
     cy.irParaExercicios();
     cy.acessarTrilhaDoIngles();
