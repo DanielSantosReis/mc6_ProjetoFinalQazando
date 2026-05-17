@@ -63,6 +63,7 @@ const getPalavrasIncorretasValue = () =>
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Meu Progresso - Projeto Final MC6', () => {
+  const { translationMap } = require('../cypress/support/translations');
   const EMAIL = 'admin@teste.com';
   const SENHA = 'Teste@123';
 
@@ -89,7 +90,7 @@ describe('Meu Progresso - Projeto Final MC6', () => {
     cy.get('body').then(($body) => {
       if ($body.text().includes('Recomeçar')) {
         cy.contains(/Recome/i).click();
-        cy.wait(1500);
+        cy.get('input[placeholder="Sua resposta aqui..."]', { timeout: 10000 }).should('be.visible');
       }
     });
 
@@ -99,16 +100,14 @@ describe('Meu Progresso - Projeto Final MC6', () => {
 
     // Aguarda a requisição Supabase de carregar progresso terminar
     cy.wait('@carregarProgresso', { timeout: 15000 });
-    cy.wait(1000); // Pequena pausa extra para garantia de renderização
+    aguardarProgressoCarregar();
 
     // ── Passo 2: Ler dinamicamente o valor inicial de "Frases Respondidas" ─
-    let valorAntesDaResposta;
     getFrasesRespondidasValue()
       .invoke('text')
       .then((textoInicial) => {
-        valorAntesDaResposta = parseInt(textoInicial.trim(), 10);
+        const valorAntesDaResposta = parseInt(textoInicial.trim(), 10);
         cy.log('[PASSO 2] Frases Respondidas (valor inicial lido): ' + valorAntesDaResposta);
-        cy.wrap(valorAntesDaResposta).as('valorInicial');
       });
 
     // ── Passo 3: Clicar em "Continuar Praticando" para ir a /exercises ────
@@ -129,7 +128,7 @@ describe('Meu Progresso - Projeto Final MC6', () => {
 
     // ── Passo 5: Aguardar o toast de feedback sumir completamente ──────────
     // O toast intercepta cliques quando esta visivel, tornando "Recomecar" inacessivel.
-    cy.wait(3500);
+    cy.contains(/Correto/i).should('not.exist');
 
     // ── Passo 6: Clicar em "Recomecar" (agora visivel na questao 2) ────────
     cy.scrollTo('top');
@@ -139,7 +138,7 @@ describe('Meu Progresso - Projeto Final MC6', () => {
     cy.contains(/Reiniciados|Reiniciado|novamente/i, { timeout: 10000 }).should('be.visible');
 
     // Aguarda o reset ser processado pelo servidor
-    cy.wait(2000);
+    cy.get('input[placeholder="Sua resposta aqui..."]', { timeout: 10000 }).should('be.visible');
 
     // ── Passo 7: Navegar para "Meu Progresso" ─────────────────────────────
     cy.contains(/Meu Progresso/i).click();
@@ -147,7 +146,7 @@ describe('Meu Progresso - Projeto Final MC6', () => {
 
     // Aguarda a requisição Supabase terminar
     cy.wait('@carregarProgresso', { timeout: 15000 });
-    cy.wait(1000);
+    aguardarProgressoCarregar();
 
     // ── Passo 8: Verificar "Frases Respondidas" apos "Recomecar" ─────────────
     // "Recomecar" reinicia a sequencia de questoes mas NAO zera o historico.
@@ -179,7 +178,7 @@ describe('Meu Progresso - Projeto Final MC6', () => {
 
     // Aguarda o POST ser concluido e da tempo adicional para o BD propagar.
     cy.wait('@salvarResposta', { timeout: 15000 });
-    cy.wait(1500);
+    cy.contains(/Correto/i).should('not.exist');
 
     // ── Passo 13: Navegar para "Meu Progresso" ────────────────────────────
     cy.contains(/Meu Progresso/i).click();
@@ -212,7 +211,7 @@ describe('Meu Progresso - Projeto Final MC6', () => {
     // Aguarda o carregamento inicial de todas as estatísticas
     cy.wait('@carregarProgresso', { timeout: 15000 });
     cy.wait('@carregarQuizProgresso', { timeout: 15000 });
-    cy.wait(1000);
+    aguardarProgressoCarregar();
 
     // ── Passo 2: Ler valores iniciais dinamicamente ───────────────────────
     getPalavrasRespondidasValue()
@@ -241,118 +240,17 @@ describe('Meu Progresso - Projeto Final MC6', () => {
     cy.url({ timeout: 10000 }).should('include', '/quiz');
 
     // ── Passo 4: Responder a uma pergunta do Quiz ──────────────────────────
-    const translationMap = {
-      // Verbs
-      'run': 'correr',
-      'walk': 'caminhar',
-      'sleep': 'dormir',
-      'eat': 'comer',
-      'drink': 'beber',
-      'speak': 'falar',
-      'write': 'escrever',
-      'read': 'ler',
-      
-      // Nouns
-      'dog': 'cachorro',
-      'cat': 'gato',
-      'bird': 'pássaro',
-      'fish': 'peixe',
-      'book': 'livro',
-      'pen': 'caneta',
-      'pencil': 'lápis',
-      'paper': 'papel',
-      'house': 'casa',
-      'car': 'carro',
-      'bicycle': 'bicicleta',
-      'train': 'trem',
-      'airplane': 'avião',
-      'water': 'água',
-      'bread': 'pão',
-      'milk': 'leite',
-      'coffee': 'café',
-      'tea': 'chá',
-      'apple': 'maçã',
-      'banana': 'banana',
-      'orange': 'laranja',
-      'sun': 'sol',
-      'moon': 'lua',
-      'star': 'estrela',
-      'sky': 'céu',
-      'tree': 'árvore',
-      'flower': 'flor',
-      'city': 'cidade',
-      'country': 'país',
-      'school': 'escola',
-      'teacher': 'professor',
-      'student': 'estudante',
-      'friend': 'amigo',
-      'family': 'família',
-      'mother': 'mãe',
-      'father': 'pai',
-      'brother': 'irmão',
-      'sister': 'irmã',
-      'time': 'tempo',
-      'day': 'dia',
-      'night': 'noite',
-      'year': 'ano',
-      'money': 'dinheiro',
-      'job': 'trabalho',
-      'music': 'música',
-      'movie': 'filme',
-      
-      // Adjectives
-      'happy': 'feliz',
-      'sad': 'triste',
-      'angry': 'bravo',
-      'tired': 'cansado',
-      'big': 'grande',
-      'small': 'pequeno',
-      'hot': 'quente',
-      'cold': 'frio',
-      'beautiful': 'bonito',
-      'ugly': 'feio',
-      'good': 'bom',
-      'bad': 'ruim',
-      'easy': 'fácil',
-      'difficult': 'difícil',
-      'fast': 'rápido',
-      'slow': 'devagar',
-      'new': 'novo',
-      'old': 'velho',
-      'young': 'jovem',
-      'clean': 'limpo',
-      'dirty': 'sujo',
-      'rich': 'rico',
-      'poor': 'pobre',
-      'strong': 'forte',
-      'weak': 'fraco',
-      
-      // Basic Phrases / Other
-      'hello': 'olá',
-      'goodbye': 'tchau',
-      'yes': 'sim',
-      'no': 'não',
-      'please': 'por favor',
-      'thank you': 'obrigado',
-      'sorry': 'desculpe'
-    };
-
     // Lê a palavra em inglês para responder
     cy.contains('Qual a tradução de:', { timeout: 15000 }).next().invoke('text').then((word) => {
       const cleanedWord = word.trim().toLowerCase();
       const expectedTranslation = translationMap[cleanedWord];
+      expect(expectedTranslation, `Palavra não mapeada no dicionário: "${cleanedWord}"`).to.exist;
 
-      if (expectedTranslation) {
-        // Seleciona e clica na opção correta
-        cy.get('button.h-16').contains(expectedTranslation).click();
-      } else {
-        // Fallback: clica na primeira opção
-        cy.get('button.h-16').first().click();
-      }
+      // Seleciona e clica na opção correta
+      cy.get('button.h-16').contains(expectedTranslation).click();
 
       // Aguarda a gravação no Supabase
       cy.wait('@salvarQuizResposta', { timeout: 15000 });
-      cy.wait(1500);
 
       // ── Passo 5: Retornar para "Meu Progresso" ────────────────────────────
       cy.contains(/Meu Progresso/i).click();
@@ -361,7 +259,7 @@ describe('Meu Progresso - Projeto Final MC6', () => {
       // Aguarda o reload das estatísticas do Supabase
       cy.wait('@carregarProgresso', { timeout: 15000 });
       cy.wait('@carregarQuizProgresso', { timeout: 15000 });
-      cy.wait(1500);
+      aguardarProgressoCarregar();
 
       // ── Passo 6: Validar os novos valores ───────────────────────────────
       // O contador "Palavras Respondidas" deve ser respondidasAntes + 1.
